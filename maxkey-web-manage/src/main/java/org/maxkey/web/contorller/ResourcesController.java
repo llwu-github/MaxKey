@@ -1,3 +1,20 @@
+/*
+ * Copyright [2020] [MaxKey of copyright http://www.maxkey.top]
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+ 
+
 package org.maxkey.web.contorller;
 
 import java.util.HashMap;
@@ -5,8 +22,8 @@ import java.util.List;
 
 import org.apache.mybatis.jpa.persistence.JpaPageResults;
 import org.maxkey.constants.ConstantsOperateMessage;
-import org.maxkey.dao.service.ResourcesService;
 import org.maxkey.domain.Resources;
+import org.maxkey.persistence.service.ResourcesService;
 import org.maxkey.web.WebContext;
 import org.maxkey.web.component.TreeNode;
 import org.maxkey.web.component.TreeNodeList;
@@ -143,7 +160,7 @@ public class ResourcesController {
 	    _logger.debug("resourcesTree appId :" + appId + " ,appName " + appName);
 	    Resources queryRes = new Resources();
 	    queryRes.setAppId(appId);
-	    List<Resources> resourcesList = this.resourcesService.query(queryRes);
+	    List<Resources> resourcesList = this.resourcesService.queryResourcesTree(queryRes);
 	    TreeNodeList treeNodeList = new TreeNodeList();
 	    
 	    TreeNode rootNode = new TreeNode(appId, appName);
@@ -153,7 +170,7 @@ public class ResourcesController {
 	    for (Resources res : resourcesList) {
 	      TreeNode treeNode = new TreeNode(res.getId(), res.getName());
 	      treeNode.setAttr("data", res);
-	      treeNode.setPId(res.getPid());
+	      treeNode.setPId(res.getParentId());
 	      treeNodeList.addTreeNode(treeNode.getAttr());
 	    } 
 

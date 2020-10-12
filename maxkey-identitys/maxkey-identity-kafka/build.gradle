@@ -1,0 +1,11 @@
+description = "maxkey-identity-kafka"
+
+apply plugin: 'java'
+
+dependencies {
+	//local jars
+	compile fileTree(dir: '../maxkey-lib/*/', include: '*.jar')
+	
+	compile project(":maxkey-core")
+   
+}

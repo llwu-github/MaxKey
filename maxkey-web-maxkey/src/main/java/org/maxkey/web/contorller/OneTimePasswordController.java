@@ -1,3 +1,20 @@
+/*
+ * Copyright [2020] [MaxKey of copyright http://www.maxkey.top]
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+ 
+
 package org.maxkey.web.contorller;
 
 import java.awt.image.BufferedImage;
@@ -7,11 +24,11 @@ import org.maxkey.crypto.Base32Utils;
 import org.maxkey.crypto.password.PasswordReciprocal;
 import org.maxkey.crypto.password.opt.algorithm.KeyUriFormat;
 import org.maxkey.crypto.password.opt.algorithm.OtpSecret;
-import org.maxkey.dao.service.UserInfoService;
 import org.maxkey.domain.UserInfo;
+import org.maxkey.persistence.service.UserInfoService;
 import org.maxkey.util.RQCodeUtils;
-import org.maxkey.web.ImageEndpoint;
 import org.maxkey.web.WebContext;
+import org.maxkey.web.image.ImageEndpoint;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

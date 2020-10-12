@@ -16,12 +16,19 @@
   <tr>
     <td>
 	<div>
-<form  method="post" type="label" autoclose="true"  action="<@base/>/safe/changeExpiredPassword"> 
+<form   method="post" type="label" autoclose="true"  action="<@base/>/safe/changeExpiredPassword"> 
 	
 	  <table  class="table table-bordered"  >
 			<tbody>
 			<tr>
-				<th  colspan="2"><@locale code="login.password.expired.tip" /></th>
+				<th  colspan="2">
+					<@locale code="login.password.expired.tip" />
+				</th>
+			</tr>
+			<tr <#if ''==errorMessage>style="display:none;"</#if>>
+				<th  colspan="2" style="color:red;">
+					${errorMessage!}
+				</th>
 			</tr>
 			<tr>
 				<th><@locale code="userinfo.displayName" /> :</th>

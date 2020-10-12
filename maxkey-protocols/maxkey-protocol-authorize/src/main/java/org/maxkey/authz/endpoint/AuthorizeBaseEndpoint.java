@@ -1,15 +1,32 @@
+/*
+ * Copyright [2020] [MaxKey of copyright http://www.maxkey.top]
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+ 
+
 /**
  * 
  */
 package org.maxkey.authz.endpoint;
 
-import org.maxkey.config.ApplicationConfig;
+import org.maxkey.configuration.ApplicationConfig;
 import org.maxkey.crypto.ReciprocalUtils;
-import org.maxkey.dao.service.AccountsService;
-import org.maxkey.dao.service.AppsService;
 import org.maxkey.domain.Accounts;
 import org.maxkey.domain.UserInfo;
 import org.maxkey.domain.apps.Apps;
+import org.maxkey.persistence.service.AccountsService;
+import org.maxkey.persistence.service.AppsService;
 import org.maxkey.web.WebContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,28 +41,29 @@ import org.springframework.web.servlet.ModelAndView;
 public class AuthorizeBaseEndpoint {
 	final static Logger _logger = LoggerFactory.getLogger(AuthorizeBaseEndpoint.class);
 	
+	@Autowired 
+    @Qualifier("applicationConfig")
+    protected ApplicationConfig applicationConfig;
+	
 	@Autowired
 	@Qualifier("appsService")
 	protected AppsService appsService;
-	
-	@Autowired 
-  	@Qualifier("applicationConfig")
-  	protected ApplicationConfig applicationConfig;
-	
+		
 	@Autowired
-	AccountsService accountsService;
-	
-	
+	@Qualifier("accountsService")
+	protected AccountsService accountsService;
+		
 	protected Apps getApp(String id){
 		Apps  app=(Apps)WebContext.getAttribute(AuthorizeBaseEndpoint.class.getName());
 		//session中为空或者id不一致重新加载
 		if(app==null||!app.getId().equalsIgnoreCase(id)) {
-			app=appsService.get(id);		
+			app=appsService.get(id);
+			WebContext.setAttribute(AuthorizeBaseEndpoint.class.getName(), app);
 		}
 		if(app	==	null){
 			_logger.error("Applications for id "+id + "  is null");
 		}
-		WebContext.setAttribute(AuthorizeBaseEndpoint.class.getName(), app);
+		
 		return app;
 	}
 	

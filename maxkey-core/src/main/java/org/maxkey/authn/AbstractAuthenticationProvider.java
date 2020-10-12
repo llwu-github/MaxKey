@@ -1,8 +1,25 @@
+/*
+ * Copyright [2020] [MaxKey of copyright http://www.maxkey.top]
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+ 
+
 package org.maxkey.authn;
 
 import org.maxkey.authn.realm.AbstractAuthenticationRealm;
 import org.maxkey.authn.support.rememberme.AbstractRemeberMeService;
-import org.maxkey.config.ApplicationConfig;
+import org.maxkey.configuration.ApplicationConfig;
 import org.maxkey.constants.ConstantsLoginType;
 import org.maxkey.crypto.password.PasswordReciprocal;
 import org.maxkey.crypto.password.opt.AbstractOptAuthn;
@@ -47,7 +64,16 @@ public abstract class AbstractAuthenticationProvider {
     protected abstract String getProviderName();
 
     protected abstract Authentication doInternalAuthenticate(Authentication authentication);
+    
+    public abstract Authentication basicAuthenticate(Authentication authentication) ;
 
+    public abstract Authentication trustAuthentication(
+                                    String username, 
+                                    String type, 
+                                    String provider, 
+                                    String code,
+                                    String message);
+    
     @SuppressWarnings("rawtypes")
     public boolean supports(Class authentication) {
         return (UsernamePasswordAuthenticationToken.class.isAssignableFrom(authentication));
@@ -65,12 +91,12 @@ public abstract class AbstractAuthenticationProvider {
         try {
             authentication = doInternalAuthenticate(authentication);
         } catch (AuthenticationException e) {
-            e.printStackTrace();
             _logger.error("Failed to authenticate user {} via {}: {}",
                     new Object[] { 
                             authentication.getPrincipal(), getProviderName(), e.getMessage() });
+            WebContext.setAttribute(
+                    WebConstants.LOGIN_ERROR_SESSION_MESSAGE, e.getMessage());
         } catch (Exception e) {
-            e.printStackTrace();
             String message = "Unexpected exception in " + getProviderName() + " authentication:";
             _logger.error("Login error " + message, e);
         }
@@ -87,6 +113,10 @@ public abstract class AbstractAuthenticationProvider {
                 .getAttribute(WebConstants.CURRENT_LOGIN_USER_PASSWORD_SET_TYPE);
         // 登录完成后切换SESSION
         _logger.debug("Login  Session {}.", WebContext.getSession().getId());
+        
+        final Object firstSavedRequest =
+                WebContext.getAttribute(WebConstants.FIRST_SAVED_REQUEST_PARAMETER);
+        
         WebContext.getSession().invalidate();
         WebContext.setAttribute(
                 WebConstants.CURRENT_USER_SESSION_ID, WebContext.getSession().getId());
@@ -95,6 +125,7 @@ public abstract class AbstractAuthenticationProvider {
         authenticationRealm.insertLoginHistory(
                 userInfo, ConstantsLoginType.LOCAL, "", "xe00000004", "success");
 
+        WebContext.setAttribute(WebConstants.FIRST_SAVED_REQUEST_PARAMETER,firstSavedRequest);
         // 认证设置
         WebContext.setAuthentication(authentication);
         WebContext.setUserInfo(userInfo);
@@ -118,8 +149,11 @@ public abstract class AbstractAuthenticationProvider {
      */
     protected void sessionValid(String sessionId) {
         if (sessionId == null || !sessionId.equals(WebContext.getSession().getId())) {
-            String message = WebContext.getI18nValue("login.error.session");
             _logger.debug("login session valid error.");
+            _logger.debug("login session sessionId " + sessionId);
+            _logger.debug("login getSession sessionId " + WebContext.getSession().getId());
+            
+            String message = WebContext.getI18nValue("login.error.session");
             throw new BadCredentialsException(message);
         }
     }
@@ -140,7 +174,6 @@ public abstract class AbstractAuthenticationProvider {
     }
 
     protected void authTypeValid(String authType) {
-        final   String message = WebContext.getI18nValue("login.error.authtype");
         _logger.debug("Login AuthN Type  " + authType);
         if (authType != null && (
                 authType.equalsIgnoreCase("basic") 
@@ -148,7 +181,9 @@ public abstract class AbstractAuthenticationProvider {
             ) {
             return;
         }
-        _logger.debug("Login AuthN type must eq basic or tfa .");
+        
+        final   String message = WebContext.getI18nValue("login.error.authtype");
+        _logger.debug("Login AuthN type must eq basic or tfa ， Error message is " + message);
         throw new BadCredentialsException(message);
     }
 
@@ -183,7 +218,7 @@ public abstract class AbstractAuthenticationProvider {
      */
     protected void tftcaptchaValid(String otpCaptcha, String authType, UserInfo userInfo) {
         // for one time password 2 factor
-        if (applicationConfig.getLoginConfig().isOneTimePwd() && authType.equalsIgnoreCase("tfa")) {
+        if (applicationConfig.getLoginConfig().isMfa() && authType.equalsIgnoreCase("tfa")) {
             UserInfo validUserInfo = new UserInfo();
             validUserInfo.setUsername(userInfo.getUsername());
             String sharedSecret = 
@@ -207,7 +242,7 @@ public abstract class AbstractAuthenticationProvider {
      * @param password String
      * @return
      */
-    protected UserInfo loadUserInfo(String username, String password) {
+    public UserInfo loadUserInfo(String username, String password) {
         UserInfo userInfo = authenticationRealm.loadUserInfo(username, password);
 
         if (userInfo != null) {

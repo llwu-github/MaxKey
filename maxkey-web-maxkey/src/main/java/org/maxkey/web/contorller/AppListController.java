@@ -1,23 +1,39 @@
+/*
+ * Copyright [2020] [MaxKey of copyright http://www.maxkey.top]
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+ 
+
 package org.maxkey.web.contorller;
 
 import java.util.List;
 import org.maxkey.constants.ConstantsOperateMessage;
 import org.maxkey.constants.ConstantsProtocols;
 import org.maxkey.crypto.ReciprocalUtils;
-import org.maxkey.dao.service.AccountsService;
-import org.maxkey.dao.service.AppsService;
-import org.maxkey.dao.service.UserInfoService;
 import org.maxkey.domain.Accounts;
 import org.maxkey.domain.UserInfo;
 import org.maxkey.domain.apps.Apps;
 import org.maxkey.domain.apps.UserApps;
+import org.maxkey.persistence.service.AccountsService;
+import org.maxkey.persistence.service.AppsService;
+import org.maxkey.persistence.service.UserInfoService;
 import org.maxkey.web.WebContext;
 import org.maxkey.web.message.Message;
 import org.maxkey.web.message.MessageType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -39,9 +55,6 @@ public class AppListController {
     private UserInfoService userInfoService;
 
     @Autowired
-    protected JdbcTemplate jdbcTemplate;
-
-    @Autowired
     AccountsService appUsersService;
 
     @Autowired
@@ -56,13 +69,7 @@ public class AppListController {
     public ModelAndView appList(
             @RequestParam(value = "gridList", required = false) String gridList) {
         ModelAndView modelAndView = new ModelAndView("main/appList");
-
-        if (gridList != null && !gridList.equals("")) {
-            int intGridList = Integer.parseInt(gridList);
-            jdbcTemplate.update("UPDATE USERINFO SET GRIDLIST = ? WHERE ID = ?", intGridList,
-                    WebContext.getUserInfo().getId());
-            WebContext.getUserInfo().setGridList(intGridList);
-        }
+        userInfoService.updateGridList(gridList);
         modelAndView.addObject("appList", queryAccessableApps());
         return modelAndView;
     }

@@ -1,3 +1,20 @@
+/*
+ * Copyright [2020] [MaxKey of copyright http://www.maxkey.top]
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+ 
+
 package org.maxkey.domain.apps.oauth2.provider.client;
 
 import java.util.ArrayList;
@@ -74,6 +91,8 @@ public class BaseClientDetails implements ClientDetails {
 	private String userInfoEncryptionMethod;
 	
 	private String jwksUri;
+	
+	private String approvalPrompt;
 	
 	
 	public BaseClientDetails() {
@@ -343,7 +362,16 @@ public class BaseClientDetails implements ClientDetails {
 		this.jwksUri = jwksUri;
 	}
 
-	@Override
+	
+	public String getApprovalPrompt() {
+        return approvalPrompt;
+    }
+
+    public void setApprovalPrompt(String approvalPrompt) {
+        this.approvalPrompt = approvalPrompt;
+    }
+
+    @Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;

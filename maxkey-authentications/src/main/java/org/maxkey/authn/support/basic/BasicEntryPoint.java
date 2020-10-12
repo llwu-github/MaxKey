@@ -1,13 +1,32 @@
+/*
+ * Copyright [2020] [MaxKey of copyright http://www.maxkey.top]
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+ 
+
 package org.maxkey.authn.support.basic;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.maxkey.authn.AbstractAuthenticationProvider;
 import org.maxkey.constants.ConstantsLoginType;
 import org.maxkey.util.AuthorizationHeaderUtils;
-import org.maxkey.web.WebContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
@@ -18,7 +37,20 @@ public class BasicEntryPoint extends HandlerInterceptorAdapter {
 	
 	boolean enable;
 	
-	String []skipRequestURI={
+	@Autowired
+    @Qualifier("authenticationProvider")
+	AbstractAuthenticationProvider authenticationProvider ;
+	
+	public BasicEntryPoint() {
+	    
+    }
+	
+	public BasicEntryPoint(boolean enable) {
+        super();
+        this.enable = enable;
+    }
+
+    String []skipRequestURI={
 			"/oauth/v20/token",
 			"/oauth/v10a/request_token",
 			"/oauth/v10a/access_token"
@@ -51,6 +83,7 @@ public class BasicEntryPoint extends HandlerInterceptorAdapter {
 		 
 		// session not exists，session timeout，recreate new session
 		 if(request.getSession(false) == null) {
+		    _logger.info("recreate new session .");
 			request.getSession(true);
 		 }
 		 String basicCredential =request.getHeader(AuthorizationHeaderUtils.AUTHORIZATION_HEADERNAME);
@@ -99,9 +132,8 @@ public class BasicEntryPoint extends HandlerInterceptorAdapter {
 		 }
 		 
 		 if(!isAuthenticated){
-			if(WebContext.setAuthentication(username,ConstantsLoginType.BASIC,"","","success")){
+			authenticationProvider.trustAuthentication(username,ConstantsLoginType.BASIC,"","","success");
 				_logger.info("Authentication  "+username+" successful .");
-			}
 		 }
 		
 		 return true;

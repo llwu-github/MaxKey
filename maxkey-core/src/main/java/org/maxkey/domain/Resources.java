@@ -1,3 +1,20 @@
+/*
+ * Copyright [2020] [MaxKey of copyright http://www.maxkey.top]
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+ 
+
 package org.maxkey.domain;
 
 import java.io.Serializable;
@@ -8,7 +25,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import org.apache.mybatis.jpa.persistence.JpaBaseDomain;
 
-@Table(name = "RESOURCES")
+@Table(name = "MXK_RESOURCES")
 public class Resources  extends JpaBaseDomain implements Serializable {
     private static final long serialVersionUID = 2567171742999638608L;
     @Id
@@ -18,17 +35,24 @@ public class Resources  extends JpaBaseDomain implements Serializable {
     @Column
     String name;
     @Column
+    int sortIndex;
+    @Column
     String appId;
+    String appName;
     @Column
-    String pid;
+    String parentId;
     @Column
-    String pname;
+    String parentName;
     @Column
-    String resType;
+    String resourceType;
     @Column
-    String resUrl;
+    String resourceIcon;
     @Column
-    String resAction;
+    String resourceStyle;
+    @Column
+    String resourceUrl;
+    @Column
+    String resourceAction;
     @Column
     String status;
     @Column
@@ -61,6 +85,78 @@ public class Resources  extends JpaBaseDomain implements Serializable {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getAppId() {
+        return appId;
+    }
+
+    public void setAppId(String appId) {
+        this.appId = appId;
+    }
+
+    public String getAppName() {
+        return appName;
+    }
+
+    public void setAppName(String appName) {
+        this.appName = appName;
+    }
+
+    public String getParentId() {
+        return parentId;
+    }
+
+    public void setParentId(String parentId) {
+        this.parentId = parentId;
+    }
+
+    public String getParentName() {
+        return parentName;
+    }
+
+    public void setParentName(String parentName) {
+        this.parentName = parentName;
+    }
+
+    public String getResourceType() {
+        return resourceType;
+    }
+
+    public void setResourceType(String resourceType) {
+        this.resourceType = resourceType;
+    }
+
+    public String getResourceIcon() {
+        return resourceIcon;
+    }
+
+    public void setResourceIcon(String resourceIcon) {
+        this.resourceIcon = resourceIcon;
+    }
+
+    public String getResourceStyle() {
+        return resourceStyle;
+    }
+
+    public void setResourceStyle(String resourceStyle) {
+        this.resourceStyle = resourceStyle;
+    }
+
+    public String getResourceUrl() {
+        return resourceUrl;
+    }
+
+    public void setResourceUrl(String resourceUrl) {
+        this.resourceUrl = resourceUrl;
+    }
+
+    public String getResourceAction() {
+        return resourceAction;
+    }
+
+    public void setResourceAction(String resourceAction) {
+        this.resourceAction = resourceAction;
     }
 
     public String getStatus() {
@@ -111,54 +207,12 @@ public class Resources  extends JpaBaseDomain implements Serializable {
         this.modifiedDate = modifiedDate;
     }
 
-    public String getResType() {
-        return resType;
+    public int getSortIndex() {
+        return sortIndex;
     }
 
-    public void setResType(String resType) {
-        this.resType = resType;
+    public void setSortIndex(int sortIndex) {
+        this.sortIndex = sortIndex;
     }
 
-    public String getResUrl() {
-        return resUrl;
-    }
-
-    public void setResUrl(String resUrl) {
-        this.resUrl = resUrl;
-    }
-
-    public String getResAction() {
-        return resAction;
-    }
-
-    public void setResAction(String resAction) {
-        this.resAction = resAction;
-    }
-
-    public String getPid() {
-        return pid;
-    }
-
-    public void setPid(String pid) {
-        this.pid = pid;
-    }
-
-    public String getPname() {
-        return pname;
-    }
-
-    public void setPname(String pname) {
-        this.pname = pname;
-    }
-
-    public String getAppId() {
-        return appId;
-    }
-
-    public void setAppId(String appId) {
-        this.appId = appId;
-    }
-    
-    
-   
 }

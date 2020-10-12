@@ -8,11 +8,10 @@
 <#include  "../layout/top.ftl"/>
 <#include  "../layout/nav_primary.ftl"/>
 <div class="container">
-<table width="100%">
-  <tr>
-    <td>
-
-<form    method="post"  action="<@base/>/safe/changePassword"  class="needs-validation" novalidate> 
+<div class="row">
+<div class="col-md-1"></div>
+<div class="col-md-10">
+<form   id="actionForm"    method="post"  action="<@base/>/safe/changePassword"  class="needs-validation" novalidate> 
 
 	  <table   class="table table-bordered" >
 			<tbody>
@@ -63,9 +62,9 @@
 		</tbody>
 	  </table>
 </form>
-</td>
-  </tr>
-</table>
+</div>
+<div class="col-md-1"></div>
+</div >
 </div>
 <div id="footer">
 	<#include   "../layout/footer.ftl"/>

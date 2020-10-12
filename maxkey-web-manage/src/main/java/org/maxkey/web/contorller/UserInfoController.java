@@ -1,3 +1,20 @@
+/*
+ * Copyright [2020] [MaxKey of copyright http://www.maxkey.top]
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+ 
+
 package org.maxkey.web.contorller;
 
 import java.beans.PropertyEditorSupport;
@@ -11,8 +28,8 @@ import javax.validation.Valid;
 import org.apache.mybatis.jpa.persistence.JpaPageResults;
 import org.maxkey.constants.ConstantsOperateMessage;
 import org.maxkey.crypto.ReciprocalUtils;
-import org.maxkey.dao.service.UserInfoService;
 import org.maxkey.domain.UserInfo;
+import org.maxkey.persistence.service.UserInfoService;
 import org.maxkey.util.JsonUtils;
 import org.maxkey.util.StringUtils;
 import org.maxkey.web.WebContext;
@@ -25,7 +42,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
@@ -33,7 +49,6 @@ import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
@@ -51,11 +66,7 @@ public class UserInfoController {
 	@Autowired
 	@Qualifier("userInfoService")
 	private UserInfoService userInfoService;
-	
-	@Autowired
-	private PasswordEncoder passwordEncoder;
 
-	
 	
 	/**
 	 * 查询用户列表
@@ -147,6 +158,13 @@ public class UserInfoController {
 		return userInfo;
 	}
 	
+	
+    @ResponseBody
+    @RequestMapping(value = "/randomPassword")
+    public String randomPassword() {
+        return userInfoService.randomPassword();
+    }
+	   
 	/**
 	 * 修改用户
 	 * @param userInfo

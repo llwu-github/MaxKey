@@ -1,20 +1,39 @@
+/*
+ * Copyright [2020] [MaxKey of copyright http://www.maxkey.top]
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+ 
+
 package org.maxkey.web.endpoint;
 
+import java.io.IOException;
 import java.util.HashMap;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.maxkey.authn.AbstractAuthenticationProvider;
 import org.maxkey.authn.BasicAuthentication;
-import org.maxkey.authn.RealmAuthenticationProvider;
 import org.maxkey.authn.support.kerberos.KerberosService;
 import org.maxkey.authn.support.rememberme.AbstractRemeberMeService;
 import org.maxkey.authn.support.socialsignon.service.SocialSignOnProviderService;
 import org.maxkey.authn.support.wsfederation.WsFederationConstants;
-import org.maxkey.config.ApplicationConfig;
+import org.maxkey.configuration.ApplicationConfig;
 import org.maxkey.crypto.password.opt.AbstractOptAuthn;
-import org.maxkey.dao.service.UserInfoService;
 import org.maxkey.domain.UserInfo;
+import org.maxkey.persistence.service.UserInfoService;
 import org.maxkey.util.StringUtils;
 import org.maxkey.web.WebConstants;
 import org.maxkey.web.WebContext;
@@ -22,9 +41,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
-import org.springframework.security.web.savedrequest.RequestCache;
-import org.springframework.security.web.savedrequest.SavedRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -42,6 +58,8 @@ import org.springframework.web.servlet.ModelAndView;
 @Controller
 public class LoginEndpoint {
 	private static Logger _logger = LoggerFactory.getLogger(LoginEndpoint.class);
+	
+	
 	
 	@Autowired
   	@Qualifier("applicationConfig")
@@ -69,7 +87,7 @@ public class LoginEndpoint {
 	
 	@Autowired
 	@Qualifier("authenticationProvider")
-	RealmAuthenticationProvider authenticationProvider ;
+	AbstractAuthenticationProvider authenticationProvider ;
 	
 	@Autowired
     @Qualifier("tfaOptAuthn")
@@ -129,8 +147,8 @@ public class LoginEndpoint {
 		if(!isAuthenticated){
 			modelAndView.addObject("isRemeberMe", applicationConfig.getLoginConfig().isRemeberMe());
 			modelAndView.addObject("isKerberos", applicationConfig.getLoginConfig().isKerberos());
-			modelAndView.addObject("isOneTimePwd", applicationConfig.getLoginConfig().isOneTimePwd());
-			if(applicationConfig.getLoginConfig().isOneTimePwd()) {
+			modelAndView.addObject("isMfa", applicationConfig.getLoginConfig().isMfa());
+			if(applicationConfig.getLoginConfig().isMfa()) {
 			    modelAndView.addObject("optType", tfaOptAuthn.getOptType());
 			    modelAndView.addObject("optInterval", tfaOptAuthn.getInterval());
 			}
@@ -148,36 +166,32 @@ public class LoginEndpoint {
 				modelAndView.addObject("ssopList", socialSignOnProviderService.getSocialSignOnProviders());
 			}
 		}
-		//save  first protected url 
-		SavedRequest  firstSavedRequest = (SavedRequest)WebContext.getAttribute(WebConstants.FIRST_SAVED_REQUEST_PARAMETER);
-		if(firstSavedRequest==null){
-			RequestCache requestCache = new HttpSessionRequestCache();
-			SavedRequest  savedRequest =requestCache.getRequest(request, response);
-			if(savedRequest!=null){
-				_logger.debug("first request parameter "+savedRequest.getRedirectUrl());
-				WebContext.setAttribute(WebConstants.FIRST_SAVED_REQUEST_PARAMETER, savedRequest);
-			}
-		}else {
-			WebContext.setAttribute(WebConstants.SPRING_PROCESS_SAVED_REQUEST, firstSavedRequest);
-		}
+		
 		
 		if(isAuthenticated){
 			return  WebContext.redirect("/forwardindex");
 		}
 		
+		Object loginErrorMessage=WebContext.getAttribute(WebConstants.LOGIN_ERROR_SESSION_MESSAGE);
+        modelAndView.addObject("loginErrorMessage", loginErrorMessage==null?"":loginErrorMessage);
+        WebContext.removeAttribute(WebConstants.LOGIN_ERROR_SESSION_MESSAGE);
 		return modelAndView;
 	}
  	
  	@RequestMapping(value={"/logon.do"})
-	public ModelAndView logon(@ModelAttribute("authentication") BasicAuthentication authentication) {
+	public ModelAndView logon(
+	                    HttpServletRequest request,
+	                    HttpServletResponse response,
+	                    @ModelAttribute("authentication") BasicAuthentication authentication) throws ServletException, IOException {
+
+        authenticationProvider.authenticate(authentication);
+
+        if (WebContext.isAuthenticated()) {
+            return WebContext.redirect("/forwardindex");
+        } else {
+            return WebContext.redirect("/login");
+        }
  		
- 		authenticationProvider.authenticate(authentication);
- 
- 		if(WebContext.isAuthenticated()){
- 			return WebContext.redirect("/forwardindex");
-		}else{
-			return WebContext.redirect("/login");
-		}
  	}
 	
  	

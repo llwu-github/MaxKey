@@ -1,14 +1,32 @@
+/*
+ * Copyright [2020] [MaxKey of copyright http://www.maxkey.top]
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+ 
+
 package org.maxkey.web.contorller;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.maxkey.constants.ConstantsOperateMessage;
+import org.maxkey.constants.ConstantsPasswordSetType;
 import org.maxkey.constants.ConstantsTimeInterval;
 import org.maxkey.crypto.ReciprocalUtils;
-import org.maxkey.crypto.password.PasswordReciprocal;
-import org.maxkey.dao.service.UserInfoService;
 import org.maxkey.domain.UserInfo;
+import org.maxkey.persistence.db.PasswordPolicyValidator;
+import org.maxkey.persistence.service.UserInfoService;
 import org.maxkey.util.StringUtils;
 import org.maxkey.web.WebConstants;
 import org.maxkey.web.WebContext;
@@ -17,7 +35,6 @@ import org.maxkey.web.message.MessageType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -31,10 +48,6 @@ public class SafeController {
 	
 	@Autowired
 	private UserInfoService userInfoService;
-
-	@Autowired
-	private PasswordEncoder passwordEncoder;
-	
 	
 	@ResponseBody
 	@RequestMapping(value="/forward/changePasswod") 
@@ -51,28 +64,33 @@ public class SafeController {
 			@RequestParam("newPassword") String newPassword,
 			@RequestParam("confirmPassword") String confirmPassword) {
 		
-			if(changeUserPassword(oldPassword,newPassword,confirmPassword)) {
+			if(userInfoService.changePassword(oldPassword,newPassword,confirmPassword)) {
 				return  new Message(WebContext.getI18nValue(ConstantsOperateMessage.UPDATE_SUCCESS),MessageType.success);
 			}else {
-				return  new Message(WebContext.getI18nValue(ConstantsOperateMessage.UPDATE_ERROR),MessageType.error);
+				return  new Message(
+				        WebContext.getI18nValue(ConstantsOperateMessage.UPDATE_ERROR)+"<br>"
+				        +WebContext.getAttribute(PasswordPolicyValidator.PASSWORD_POLICY_VALIDATE_RESULT),
+				        MessageType.error);
 			}	
 	}
 
 	@RequestMapping(value="/changeExpiredPassword") 
 	public ModelAndView changeExpiredPassword(
-			@RequestParam(value ="oldPassword",required = false) String oldPassword,
-			@RequestParam("newPassword") String newPassword,
-			@RequestParam("confirmPassword") String confirmPassword) {
+			@RequestParam(value ="oldPassword" ,required = false) String oldPassword,
+			@RequestParam(value ="newPassword",required = false) String newPassword,
+			@RequestParam(value ="confirmPassword",required = false) String confirmPassword) {
 			ModelAndView modelAndView=new ModelAndView("passwordExpired");
-		
-			if(changeUserPassword(oldPassword,newPassword,confirmPassword)){
+	        if(newPassword ==null ||newPassword.equals("")) {
+	            
+	        }else if(userInfoService.changePassword(oldPassword,newPassword,confirmPassword)){
+	            WebContext.getSession().setAttribute(WebConstants.CURRENT_LOGIN_USER_PASSWORD_SET_TYPE,ConstantsPasswordSetType.PASSWORD_NORMAL);
 				return WebContext.redirect("/index");
-				//modelAndView.setViewName("index");
 			}
-				
-		
-			new Message(WebContext.getI18nValue(ConstantsOperateMessage.UPDATE_ERROR),MessageType.error);
-		 
+	        
+			Object errorMessage=WebContext.getAttribute(PasswordPolicyValidator.PASSWORD_POLICY_VALIDATE_RESULT);
+			UserInfo userInfo=WebContext.getUserInfo();
+            modelAndView.addObject("model", userInfo);
+            modelAndView.addObject("errorMessage", errorMessage==null?"":errorMessage);
 			return modelAndView;
 	}
 	
@@ -80,37 +98,23 @@ public class SafeController {
 	@RequestMapping(value="/changeInitPassword") 
 	public ModelAndView changeInitPassword(
 			@RequestParam(value ="oldPassword",required = false) String oldPassword,
-			@RequestParam("newPassword") String newPassword,
-			@RequestParam("confirmPassword") String confirmPassword) {
+			@RequestParam(value ="newPassword",required = false) String newPassword,
+			@RequestParam(value ="confirmPassword",required = false) String confirmPassword) {
 		ModelAndView modelAndView=new ModelAndView("passwordInitial");
-		
-		if(changeUserPassword(oldPassword,newPassword,confirmPassword)){
+        if(newPassword ==null ||newPassword.equals("")) {
+            
+        }else if(userInfoService.changePassword(oldPassword,newPassword,confirmPassword)){
+            WebContext.getSession().setAttribute(WebConstants.CURRENT_LOGIN_USER_PASSWORD_SET_TYPE,ConstantsPasswordSetType.PASSWORD_NORMAL);
 			return WebContext.redirect("/index");
-			//modelAndView.setViewName("index");
 		}
 		
-		  new Message(WebContext.getI18nValue(ConstantsOperateMessage.UPDATE_ERROR),MessageType.error);
-		  return modelAndView;
+        Object errorMessage=WebContext.getAttribute(PasswordPolicyValidator.PASSWORD_POLICY_VALIDATE_RESULT);
+        modelAndView.addObject("errorMessage", errorMessage==null?"":errorMessage);
+        UserInfo userInfo=WebContext.getUserInfo();
+        modelAndView.addObject("model", userInfo);
+        return modelAndView;
 	}
 	
-	public boolean changeUserPassword(String oldPassword,
-									String newPassword,
-									String confirmPassword){
-		UserInfo userInfo =WebContext.getUserInfo();
-		_logger.debug("decipherable old : "+userInfo.getDecipherable());
-		_logger.debug("decipherable new : "+ReciprocalUtils.encode(PasswordReciprocal.getInstance().rawPassword(userInfo.getUsername(), newPassword)));
-		if(newPassword.equals(confirmPassword)){
-			if(oldPassword==null || 
-					passwordEncoder.matches(PasswordReciprocal.getInstance().rawPassword(userInfo.getUsername(),oldPassword), userInfo.getPassword())){
-				userInfo.setPassword(newPassword);
-				userInfoService.changePassword(userInfo);
-				//TODO syncProvisioningService.changePassword(userInfo);
-				return true;
-			}
-		}
-		return false;
-		
-	}
 
 	@ResponseBody
 	@RequestMapping(value="/forward/changeAppLoginPasswod") 

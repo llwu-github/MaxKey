@@ -1,3 +1,20 @@
+/*
+ * Copyright [2020] [MaxKey of copyright http://www.maxkey.top]
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+ 
+
 package org.maxkey.authz.saml20.consumer.endpoint;
 
 import java.io.ByteArrayInputStream;
@@ -13,6 +30,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
+import org.maxkey.authn.AbstractAuthenticationProvider;
 import org.maxkey.authz.saml.common.EndpointGenerator;
 import org.maxkey.authz.saml.common.TrustResolver;
 import org.maxkey.authz.saml.service.IDService;
@@ -25,9 +43,8 @@ import org.maxkey.authz.saml20.provider.xml.AuthnResponseGenerator;
 import org.maxkey.authz.saml20.xml.SAML2ValidatorSuite;
 import org.maxkey.constants.ConstantsLoginType;
 import org.maxkey.crypto.keystore.KeyStoreLoader;
-import org.maxkey.dao.service.AppsSaml20DetailsService;
 import org.maxkey.domain.apps.AppsSAML20Details;
-import org.maxkey.web.WebContext;
+import org.maxkey.persistence.service.AppsSaml20DetailsService;
 import org.opensaml.common.binding.SAMLMessageContext;
 import org.opensaml.common.binding.security.IssueInstantRule;
 import org.opensaml.common.binding.security.MessageReplayRule;
@@ -71,6 +88,10 @@ public class ConsumerEndpoint {
 	@Autowired
 	@Qualifier("idService")
 	private IDService idService;
+	
+	@Autowired
+    @Qualifier("authenticationProvider")
+	AbstractAuthenticationProvider authenticationProvider ;
 
 	private String singleSignOnServiceURL;
 	private String assertionConsumerServiceURL;
@@ -161,7 +182,7 @@ public class ConsumerEndpoint {
 	
 		logger.debug("assertion.getID() ", assertion.getAuthnStatements());
 		
-		WebContext.setAuthentication(username, ConstantsLoginType.SAMLTRUST,"","","success");
+		authenticationProvider.trustAuthentication(username, ConstantsLoginType.SAMLTRUST,"","","success");
 
 		ModelAndView mav = new ModelAndView();
 		mav.addObject("username", username);

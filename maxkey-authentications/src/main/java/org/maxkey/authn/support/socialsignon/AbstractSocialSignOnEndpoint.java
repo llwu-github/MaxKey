@@ -1,8 +1,26 @@
+/*
+ * Copyright [2020] [MaxKey of copyright http://www.maxkey.top]
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+ 
+
 /**
  * 
  */
 package org.maxkey.authn.support.socialsignon;
 
+import org.maxkey.authn.AbstractAuthenticationProvider;
 import org.maxkey.authn.support.socialsignon.service.SocialSignOnProvider;
 import org.maxkey.authn.support.socialsignon.service.SocialSignOnProviderService;
 import org.maxkey.authn.support.socialsignon.service.SocialsAssociateService;
@@ -10,6 +28,7 @@ import org.maxkey.web.WebContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 
 import me.zhyd.oauth.model.AuthCallback;
 import me.zhyd.oauth.model.AuthResponse;
@@ -55,7 +74,9 @@ public class AbstractSocialSignOnEndpoint {
 	@Autowired
 	protected SocialsAssociateService socialsAssociateService;
 	
-	
+	@Autowired
+    @Qualifier("authenticationProvider")
+	AbstractAuthenticationProvider authenticationProvider ;
  	
   	protected AuthRequest buildAuthRequest(String provider){
   		
@@ -80,9 +101,9 @@ public class AbstractSocialSignOnEndpoint {
   		AuthCallback authCallback=new AuthCallback();
   		authCallback.setCode(WebContext.getRequest().getParameter("code"));
   		authCallback.setAuth_code(WebContext.getRequest().getParameter("auth_code"));
-  		authCallback.setOauthToken(WebContext.getRequest().getParameter("oauthToken"));
+  		authCallback.setOauth_token(WebContext.getRequest().getParameter("oauthToken"));
   		authCallback.setAuthorization_code(WebContext.getRequest().getParameter("authorization_code"));
-  		authCallback.setOauthVerifier(WebContext.getRequest().getParameter("oauthVerifier"));
+  		authCallback.setOauth_verifier(WebContext.getRequest().getParameter("oauthVerifier"));
   		authCallback.setState(WebContext.getRequest().getParameter("state"));
   		
   		AuthResponse<?> authResponse=authRequest.login(authCallback);

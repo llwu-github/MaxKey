@@ -1,6 +1,24 @@
+/*
+ * Copyright [2020] [MaxKey of copyright http://www.maxkey.top]
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+ 
+
 package org.maxkey.authn.realm.jdbc;
 
 import org.maxkey.authn.realm.AbstractAuthenticationRealm;
+import org.maxkey.constants.ConstantsLoginType;
 import org.maxkey.crypto.password.PasswordReciprocal;
 import org.maxkey.domain.UserInfo;
 import org.maxkey.web.WebContext;
@@ -38,14 +56,17 @@ public class DefaultJdbcAuthenticationRealm extends AbstractAuthenticationRealm 
         boolean passwordMatches = false;
         _logger.info("password : " 
                 + PasswordReciprocal.getInstance().rawPassword(userInfo.getUsername(), password));
-        passwordMatches = passwordEncoder.matches(
-                PasswordReciprocal.getInstance().rawPassword(userInfo.getUsername(), password),
-                userInfo.getPassword());
+        passwordMatches = passwordEncoder.matches(password,userInfo.getPassword());
         _logger.debug("passwordvalid : " + passwordMatches);
         if (!passwordMatches) {
-            setBadPasswordCount(userInfo);
+            passwordPolicyValidator.setBadPasswordCount(userInfo);
+            insertLoginHistory(userInfo, ConstantsLoginType.LOCAL, "", "xe00000004", "password error");
             throw new BadCredentialsException(WebContext.getI18nValue("login.error.password"));
         }
         return passwordMatches;
     }
+    
+    
+    
+ 
 }

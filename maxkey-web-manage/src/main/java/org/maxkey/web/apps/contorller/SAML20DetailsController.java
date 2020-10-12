@@ -1,3 +1,20 @@
+/*
+ * Copyright [2020] [MaxKey of copyright http://www.maxkey.top]
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+ 
+
 package org.maxkey.web.apps.contorller;
 
 import java.io.IOException;
@@ -7,6 +24,7 @@ import java.security.cert.X509Certificate;
 import java.util.List;
 
 import org.maxkey.authz.saml20.metadata.MetadataDescriptorUtil;
+import org.maxkey.configuration.ApplicationConfig;
 import org.maxkey.constants.ConstantsOperateMessage;
 import org.maxkey.constants.ConstantsProtocols;
 import org.maxkey.crypto.ReciprocalUtils;
@@ -14,8 +32,8 @@ import org.maxkey.crypto.cert.NameUtil;
 import org.maxkey.crypto.cert.X509CertUtils;
 import org.maxkey.crypto.keystore.KeyStoreLoader;
 import org.maxkey.crypto.keystore.KeyStoreUtil;
-import org.maxkey.dao.service.AppsSaml20DetailsService;
 import org.maxkey.domain.apps.AppsSAML20Details;
+import org.maxkey.persistence.service.AppsSaml20DetailsService;
 import org.maxkey.web.WebContext;
 import org.maxkey.web.message.Message;
 import org.maxkey.web.message.MessageType;
@@ -47,7 +65,7 @@ public class SAML20DetailsController   extends BaseAppContorller {
 	AppsSaml20DetailsService saml20DetailsService;
 	
 	@Autowired
-	String maxKeyURI;
+	ApplicationConfig applicationConfig;
 	
 	@RequestMapping(value = { "/forwardAdd" })
 	public ModelAndView forwardAdd() {
@@ -55,6 +73,7 @@ public class SAML20DetailsController   extends BaseAppContorller {
 		AppsSAML20Details saml20Details=new AppsSAML20Details();
 		saml20Details.setSecret(ReciprocalUtils.generateKey(""));
 		saml20Details.setProtocol(ConstantsProtocols.SAML20);
+		saml20Details.setId(saml20Details.generateId());
 		modelAndView.addObject("model",saml20Details);
 		 
 		return modelAndView;
@@ -87,7 +106,7 @@ public class SAML20DetailsController   extends BaseAppContorller {
 		decoderSecret(saml20Details);
 		WebContext.setAttribute(saml20Details.getId(), saml20Details.getIcon());
 		modelAndView.addObject("model",saml20Details);
-		modelAndView.addObject("maxKeyURI",maxKeyURI);
+		modelAndView.addObject("maxKeyURI",applicationConfig.getMaxKeyUri());
 		return modelAndView;
 	}
 	/**

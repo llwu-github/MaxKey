@@ -1,3 +1,20 @@
+/*
+ * Copyright [2020] [MaxKey of copyright http://www.maxkey.top]
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+ 
+
 package org.maxkey.web.apps.contorller;
 
 import java.util.List;
@@ -88,11 +105,12 @@ public class OAuth20DetailsController  extends BaseAppContorller {
 		//
 		_logger.debug("-update  application :" + oauth20Details);
 		_logger.debug("-update  oauth20Details use oauth20JdbcClientDetails" );
+		oauth20Details.setClientSecret(oauth20Details.getSecret());
+        oauth20JdbcClientDetailsService.updateClientDetails(oauth20Details.clientDetailsRowMapper());
+        oauth20JdbcClientDetailsService.updateClientSecret(oauth20Details.getClientId(), oauth20Details.getClientSecret());
+        
 		transform(oauth20Details);
 		
-		oauth20Details.setClientSecret(oauth20Details.getSecret());
-		oauth20JdbcClientDetailsService.updateClientDetails(oauth20Details.clientDetailsRowMapper());
-		oauth20JdbcClientDetailsService.updateClientSecret(oauth20Details.getClientId(), oauth20Details.getClientSecret());
 		if (appsService.updateApp(oauth20Details)) {
 			  new Message(WebContext.getI18nValue(ConstantsOperateMessage.UPDATE_SUCCESS),MessageType.success);
 		} else {

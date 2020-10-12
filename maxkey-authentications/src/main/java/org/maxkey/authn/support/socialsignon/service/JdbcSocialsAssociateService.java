@@ -1,3 +1,20 @@
+/*
+ * Copyright [2020] [MaxKey of copyright http://www.maxkey.top]
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+ 
+
 package org.maxkey.authn.support.socialsignon.service;
 
 import java.sql.ResultSet;
@@ -14,15 +31,15 @@ import org.springframework.jdbc.core.RowMapper;
 public class JdbcSocialsAssociateService   implements SocialsAssociateService{
 	private static final Logger _logger = LoggerFactory.getLogger(JdbcSocialsAssociateService.class);
 	
-	private static final String DEFAULT_DEFAULT_INSERT_STATEMENT = "INSERT INTO  SOCIALS_ASSOCIATE(ID, UID , USERNAME , PROVIDER , SOCIALUID , ACCESSTOKEN , SOCIALUSERINFO , EXATTRIBUTE )VALUES( ? , ? , ? , ? , ?, ? , ? , ?)";
+	private static final String DEFAULT_DEFAULT_INSERT_STATEMENT = "INSERT INTO  MXK_SOCIALS_ASSOCIATE(ID, UID , USERNAME , PROVIDER , SOCIALUID , ACCESSTOKEN , SOCIALUSERINFO , EXATTRIBUTE )VALUES( ? , ? , ? , ? , ?, ? , ? , ?)";
 	
-	private static final String DEFAULT_DEFAULT_SIGNON_SELECT_STATEMENT = "SELECT ID, UID , USERNAME , PROVIDER , SOCIALUID , ACCESSTOKEN , SOCIALUSERINFO , EXATTRIBUTE  FROM SOCIALS_ASSOCIATE WHERE PROVIDER = ?  AND SOCIALUID = ?";
+	private static final String DEFAULT_DEFAULT_SIGNON_SELECT_STATEMENT = "SELECT ID, UID , USERNAME , PROVIDER , SOCIALUID , ACCESSTOKEN , SOCIALUSERINFO , EXATTRIBUTE  FROM MXK_SOCIALS_ASSOCIATE WHERE PROVIDER = ?  AND SOCIALUID = ?";
 	
-	private static final String DEFAULT_DEFAULT_BIND_SELECT_STATEMENT = "SELECT ID, UID , USERNAME , PROVIDER , SOCIALUID , ACCESSTOKEN , SOCIALUSERINFO , EXATTRIBUTE  FROM SOCIALS_ASSOCIATE WHERE UID = ?" ;
+	private static final String DEFAULT_DEFAULT_BIND_SELECT_STATEMENT = "SELECT ID, UID , USERNAME , PROVIDER , SOCIALUID , ACCESSTOKEN , SOCIALUSERINFO , EXATTRIBUTE  FROM MXK_SOCIALS_ASSOCIATE WHERE UID = ?" ;
 	
-	private static final String DEFAULT_DEFAULT_DELETE_STATEMENT = "DELETE FROM  SOCIALS_ASSOCIATE WHERE  UID = ? AND PROVIDER = ?";
+	private static final String DEFAULT_DEFAULT_DELETE_STATEMENT = "DELETE FROM  MXK_SOCIALS_ASSOCIATE WHERE  UID = ? AND PROVIDER = ?";
 	
-	private static final String DEFAULT_DEFAULT_UPDATE_STATEMENT= "UPDATE SOCIALS_ASSOCIATE  SET ACCESSTOKEN  = ? , SOCIALUSERINFO = ? , EXATTRIBUTE = ? ,UPDATEDDATE = ?  WHERE ID = ?";
+	private static final String DEFAULT_DEFAULT_UPDATE_STATEMENT= "UPDATE MXK_SOCIALS_ASSOCIATE  SET ACCESSTOKEN  = ? , SOCIALUSERINFO = ? , EXATTRIBUTE = ? ,UPDATEDDATE = ?  WHERE ID = ?";
 
 	private final JdbcTemplate jdbcTemplate;
 	

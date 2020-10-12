@@ -1,10 +1,27 @@
+/*
+ * Copyright [2020] [MaxKey of copyright http://www.maxkey.top]
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+ 
+
 package org.maxkey.authn.support.httpheader;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.maxkey.authn.AbstractAuthenticationProvider;
 import org.maxkey.constants.ConstantsLoginType;
-import org.maxkey.web.WebContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,9 +34,12 @@ import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 public class HttpHeaderEntryPoint extends HandlerInterceptorAdapter {
 	private static final Logger _logger = LoggerFactory.getLogger(HttpHeaderEntryPoint.class);
 	
-	@Autowired 
-  	@Qualifier("httpHeaderSupport")
-	HttpHeaderConfig httpHeaderSupport;
+	String headerName;
+    boolean enable;
+    
+    @Autowired
+    @Qualifier("authenticationProvider")
+    AbstractAuthenticationProvider authenticationProvider ;
 	
 	String []skipRequestURI={
 			"/oauth/v20/token",
@@ -30,7 +50,7 @@ public class HttpHeaderEntryPoint extends HandlerInterceptorAdapter {
 	 @Override
 	 public boolean preHandle(HttpServletRequest request,HttpServletResponse response, Object handler) throws Exception {
 		 
-		 if(!httpHeaderSupport.isEnable()){
+		 if(!enable){
 			 return true;
 		 }
 		 String requestPath=request.getServletPath();
@@ -54,11 +74,12 @@ public class HttpHeaderEntryPoint extends HandlerInterceptorAdapter {
 		 
 		// session not exists，session timeout，recreate new session
 		 if(request.getSession(false) == null) {
+		    _logger.info("recreate new session .");
 			request.getSession(true);
 		 }
 		 
 		 _logger.info("getSession.getId : "+ request.getSession().getId());
-		 String httpHeaderUsername = request.getHeader(httpHeaderSupport.getHeaderName());
+		 String httpHeaderUsername = request.getHeader(headerName);
 
 		 _logger.info("HttpHeader username : " + httpHeaderUsername);
 		
@@ -86,16 +107,38 @@ public class HttpHeaderEntryPoint extends HandlerInterceptorAdapter {
 		 }
 		 
 		 if(!isAuthenticated){
-			if(WebContext.setAuthentication(httpHeaderUsername,ConstantsLoginType.HTTPHEADER,"","","success")){
-				_logger.info("Authentication  "+httpHeaderUsername+" successful .");
-			}
+			authenticationProvider.trustAuthentication(httpHeaderUsername,ConstantsLoginType.HTTPHEADER,"","","success");
+			_logger.info("Authentication  "+httpHeaderUsername+" successful .");
 		 }
 		
 		 return true;
 	}
 
-	public void setHttpHeaderSupport(HttpHeaderConfig httpHeaderSupport) {
-		this.httpHeaderSupport = httpHeaderSupport;
-	}
+	 public HttpHeaderEntryPoint() {
+	        super();
+	 }
+
+    public HttpHeaderEntryPoint(String headerName, boolean enable) {
+        super();
+        this.headerName = headerName;
+        this.enable = enable;
+    }
+
+    public String getHeaderName() {
+        return headerName;
+    }
+
+    public void setHeaderName(String headerName) {
+        this.headerName = headerName;
+    }
+
+    public boolean isEnable() {
+        return enable;
+    }
+
+    public void setEnable(boolean enable) {
+        this.enable = enable;
+    }
+	 
 	
 }

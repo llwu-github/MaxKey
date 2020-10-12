@@ -1,7 +1,24 @@
+/*
+ * Copyright [2020] [MaxKey of copyright http://www.maxkey.top]
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+ 
+
 package org.maxkey.web;
 
 /**
- * Web Application Constants define
+ * Web Application Constants define.
  * 
  * @author Crystal.Sea
  *
@@ -32,9 +49,7 @@ public class WebConstants {
     public static final  String CURRENT_MESSAGE = "current_message";
 
     // SPRING_SECURITY_SAVED_REQUEST
-    public static final  String SPRING_PROCESS_SAVED_REQUEST = "SPRING_SECURITY_SAVED_REQUEST";
-
-    public static final  String FIRST_SAVED_REQUEST_PARAMETER = "first_saved_request_parameter";
+    public static final  String FIRST_SAVED_REQUEST_PARAMETER = "SPRING_SECURITY_SAVED_REQUEST";
 
     public static final  String KAPTCHA_SESSION_KEY = "kaptcha_session_key";
 
@@ -57,5 +72,7 @@ public class WebConstants {
     public static final String AUTHENTICATION = "current_authentication";
     
     public static final String THEME_COOKIE_NAME = "maxkey_theme";
+    
+    public static final String LOGIN_ERROR_SESSION_MESSAGE = "login_error_session_message_key";
 
 }

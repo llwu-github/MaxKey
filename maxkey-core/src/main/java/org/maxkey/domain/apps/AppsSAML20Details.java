@@ -1,3 +1,20 @@
+/*
+ * Copyright [2020] [MaxKey of copyright http://www.maxkey.top]
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+ 
+
 package org.maxkey.domain.apps;
 
 import java.util.Arrays;
@@ -14,7 +31,7 @@ import org.springframework.web.multipart.MultipartFile;
  * @author Crystal.Sea
  *
  */
-@Table(name = "APPS_SAML_V20_DETAILS")
+@Table(name = "MXK_APPS_SAML_V20_DETAILS")
 public class AppsSAML20Details extends Apps {
 
     /**
@@ -76,14 +93,17 @@ public class AppsSAML20Details extends Apps {
      */
     @Column
     private int nameIdConvert;
+    
+    @Column
+    private String nameIdSuffix;
 
-    public static class BINDINGTYPE {
-        public String Redirect_Post = "Redirect-Post";
-        public String Post_Post = "Post-Post";
-        public String IdpInit_Post = "IdpInit-Post";
-        public String Redirect_PostSimpleSign = "Redirect-PostSimpleSign";
-        public String Post_PostSimpleSign = "Post-PostSimpleSign";
-        public String IdpInit_PostSimpleSign = "IdpInit-PostSimpleSign";
+    public static final class BindingType {
+        public static final  String Redirect_Post = "Redirect-Post";
+        public static final  String Post_Post = "Post-Post";
+        public static final  String IdpInit_Post = "IdpInit-Post";
+        public static final  String Redirect_PostSimpleSign = "Redirect-PostSimpleSign";
+        public static final  String Post_PostSimpleSign = "Post-PostSimpleSign";
+        public static final  String IdpInit_PostSimpleSign = "IdpInit-PostSimpleSign";
     }
 
     /**
@@ -308,6 +328,14 @@ public class AppsSAML20Details extends Apps {
 
     public void setDigestMethod(String digestMethod) {
         this.digestMethod = digestMethod;
+    }
+    
+    public String getNameIdSuffix() {
+        return nameIdSuffix;
+    }
+
+    public void setNameIdSuffix(String nameIdSuffix) {
+        this.nameIdSuffix = nameIdSuffix;
     }
 
     @Override

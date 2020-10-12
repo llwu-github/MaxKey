@@ -16,12 +16,17 @@
   <tr>
     <td>
 
-<form  method="post" type="label" autoclose="true"  action="<@base/>/safe/changeInitPassword"> 
+<form   method="post" type="label" autoclose="true"  action="<@base/>/safe/changeInitPassword"> 
 
 	  <table   class="table table-bordered"  >
 			<tbody>
 			<tr>
 				<th  colspan="2"><@locale code="login.password.initial.change.tip" /></th>
+			</tr>
+			<tr <#if ''==errorMessage>style="display:none;"</#if>>
+				<th  colspan="2" style="color:red;">
+					${errorMessage!}
+				</th>
 			</tr>
 			<tr>
 				<th><@locale code="userinfo.displayName" /> :</th>
@@ -52,7 +57,7 @@
 			<tr>
 				<td colspan="2"  class="center">
 					<input id="_method" type="hidden" name="_method"  value="post"/>
-		    		<input class="button btn btn-lg btn-primaryk" style="width:100px"  type="submit"    id="submitBtn" value=" code="button.text.save" />"/>
+		    		<input class="button btn btn-lg btn-primary" style="width:100px"  type="submit"    id="submitBtn" value="<@locale code="button.text.save" />"/>
 					
 				</td>
 			</tr>

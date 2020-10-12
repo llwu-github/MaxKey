@@ -1,3 +1,20 @@
+/*
+ * Copyright [2020] [MaxKey of copyright http://www.maxkey.top]
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+ 
+
 package org.maxkey.domain;
 
 import javax.persistence.Column;
@@ -15,7 +32,7 @@ import org.maxkey.exception.PasswordPolicyException;
  *
  */
 
-@Table(name = "PASSWORD_POLICY")
+@Table(name = "MXK_PASSWORD_POLICY")
 public class PasswordPolicy extends JpaBaseDomain implements java.io.Serializable {
 
     private static final long serialVersionUID = -4797776994287829182L;
@@ -87,7 +104,24 @@ public class PasswordPolicy extends JpaBaseDomain implements java.io.Serializabl
      * not include password list
      */
     @Column
-    private String simplePasswords;
+    private int history;
+    
+    @Column
+    private int dictionary;
+    
+    @Column
+    private int alphabetical;
+    
+    @Column
+    private int numerical;
+    
+    @Column
+    private int qwerty;
+    
+    @Column
+    private int occurances;
+    
+    private int randomPasswordLength;
 
     /**
      * @return the minLength
@@ -243,18 +277,65 @@ public class PasswordPolicy extends JpaBaseDomain implements java.io.Serializabl
         this.username = username;
     }
 
-    /**
-     * @return the simplePasswords
-     */
-    public String getSimplePasswords() {
-        return simplePasswords;
+
+    public int getHistory() {
+        return history;
     }
 
-    /**
-     * @param simplePasswords the simplePasswords to set
-     */
-    public void setSimplePasswords(String simplePasswords) {
-        this.simplePasswords = simplePasswords;
+    public void setHistory(int history) {
+        this.history = history;
+    }
+
+    public int getDictionary() {
+        return dictionary;
+    }
+
+    public void setDictionary(int dictionary) {
+        this.dictionary = dictionary;
+    }
+
+    public int getAlphabetical() {
+        return alphabetical;
+    }
+
+    public void setAlphabetical(int alphabetical) {
+        this.alphabetical = alphabetical;
+    }
+
+    public int getNumerical() {
+        return numerical;
+    }
+
+    public void setNumerical(int numerical) {
+        this.numerical = numerical;
+    }
+
+    public int getQwerty() {
+        return qwerty;
+    }
+
+    public void setQwerty(int qwerty) {
+        this.qwerty = qwerty;
+    }
+
+    public static long getSerialversionuid() {
+        return serialVersionUID;
+    }
+
+    public int getOccurances() {
+        return occurances;
+    }
+
+    public void setOccurances(int occurances) {
+        this.occurances = occurances;
+    }
+    
+    public int getRandomPasswordLength() {
+        return randomPasswordLength;
+    }
+
+    public void setRandomPasswordLength(int randomPasswordLength) {
+        this.randomPasswordLength = randomPasswordLength;
     }
 
     public void check(String username, String newPassword, String oldPassword) throws PasswordPolicyException {
@@ -302,17 +383,14 @@ public class PasswordPolicy extends JpaBaseDomain implements java.io.Serializabl
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see java.lang.Object#toString()
-     */
     @Override
     public String toString() {
-        return "PasswordPolicy [minLength=" + minLength + ", maxLength=" + maxLength + ", lowerCase=" + lowerCase
-                + ", upperCase=" + upperCase + ", digits=" + digits + ", specialChar=" + specialChar + ", attempts="
-                + attempts + ", duration=" + duration + ", expiration=" + expiration + ", username=" + username
-                + ", simplePasswords=" + simplePasswords + "]";
+        return "PasswordPolicy [id=" + id + ", minLength=" + minLength + ", maxLength=" + maxLength + ", lowerCase="
+                + lowerCase + ", upperCase=" + upperCase + ", digits=" + digits + ", specialChar=" + specialChar
+                + ", attempts=" + attempts + ", duration=" + duration + ", expiration=" + expiration + ", username="
+                + username + ", history=" + history + ", dictionary=" + dictionary + ", alphabetical=" + alphabetical
+                + ", numerical=" + numerical + ", qwerty=" + qwerty + "]";
     }
 
+  
 }

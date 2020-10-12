@@ -1,3 +1,20 @@
+/*
+ * Copyright [2020] [MaxKey of copyright http://www.maxkey.top]
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+ 
+
 package org.maxkey.web;
 
 import java.io.UnsupportedEncodingException;
@@ -11,15 +28,14 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import org.apache.commons.logging.LogFactory;
-import org.maxkey.authn.BasicAuthentication;
-import org.maxkey.authn.realm.AbstractAuthenticationRealm;
-import org.maxkey.config.ApplicationConfig;
+import org.maxkey.configuration.ApplicationConfig;
 import org.maxkey.domain.UserInfo;
 import org.maxkey.util.DateUtils;
 import org.maxkey.util.StringGenerator;
 import org.maxkey.web.message.Message;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -35,7 +51,9 @@ import org.springframework.web.servlet.support.RequestContextUtils;
  * @since 1.5
  */
 public final class WebContext {
-
+    
+    final static Logger _logger = LoggerFactory.getLogger(WebContext.class);
+    
     public static Properties properties;
      
     /**
@@ -84,43 +102,6 @@ public final class WebContext {
      */
     public static void clearMessage() {
         removeAttribute(WebConstants.CURRENT_MESSAGE);
-    }
-
-    /**
-     * setAuthentication.
-     * @param username String
-     * @param type String
-     * @param provider String
-     * @param code String
-     * @param message String
-     * @return boolean
-     */
-    public static boolean setAuthentication(String username, 
-                                            String type, 
-                                            String provider, 
-                                            String code,
-                                            String message) {
-        AbstractAuthenticationRealm authenticationRealm = 
-                (AbstractAuthenticationRealm) getBean("authenticationRealm");
-        UserInfo loadeduserInfo = authenticationRealm.loadUserInfo(username, "");
-        if (loadeduserInfo != null) {
-            setUserInfo(loadeduserInfo);
-            BasicAuthentication authentication = new BasicAuthentication();
-            authentication.setUsername(loadeduserInfo.getUsername());
-            UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
-                    new UsernamePasswordAuthenticationToken(
-                            authentication, 
-                            "PASSWORD", 
-                            authenticationRealm.grantAuthority(loadeduserInfo)
-                    );
-
-            authentication.setAuthenticated(true);
-            WebContext.setAuthentication(usernamePasswordAuthenticationToken);
-            WebContext.setUserInfo(loadeduserInfo);
-
-            authenticationRealm.insertLoginHistory(loadeduserInfo, type, provider, code, message);
-        }
-        return true;
     }
 
     public static void setAuthentication(Authentication authentication) {
@@ -175,33 +156,39 @@ public final class WebContext {
     }
 
     /**
-     * get Http Context full Path,if port equals 80 is omitted.
+     * get Http Context full Path.
+     * 
+     * @return String HttpContextPath
+     */
+    public static String getHttpContextPath() {
+        HttpServletRequest httpServletRequest = WebContext.getRequest();
+        return getHttpContextPath(httpServletRequest);
+    }
+    
+    /**
+     * get Http Context full Path,if port equals 80 or 443 is omitted.
      * 
      * @return String eg:http://192.168.1.20:9080/webcontext or
      *         http://www.website.com/webcontext
      */
-    public static String getHttpContextPath() {
-        HttpServletRequest httpServletRequest = WebContext.getRequest();
+    public static String getHttpContextPath(HttpServletRequest httpServletRequest) {
         ApplicationConfig applicationConfig = (
                 ApplicationConfig) WebContext.getBean("applicationConfig");
-
-        if (applicationConfig.getServerPrefix() != null 
-                && !applicationConfig.getServerPrefix().equals("")) {
-            return applicationConfig.getServerPrefix();
-        } else {
-            String httpContextPath = 
-                    httpServletRequest.getScheme() + "://" + applicationConfig.getDomainName();
-            int port = httpServletRequest.getServerPort();
-            if (port == 443 && httpServletRequest.getScheme().equalsIgnoreCase("https")) {
-                //
-            } else if (port == 80 && httpServletRequest.getScheme().equalsIgnoreCase("http")) {
-                //
-            } else {
-                httpContextPath += ":" + port;
-            }
-            httpContextPath += httpServletRequest.getContextPath() + "";
-            return httpContextPath;
+        
+        _logger.trace("Config ServerPrefix " + applicationConfig.getServerPrefix());
+        _logger.trace("Config DomainName " + applicationConfig.getDomainName());
+        _logger.trace("ServerName " + httpServletRequest.getServerName());
+        
+        String scheme = httpServletRequest.getScheme().toLowerCase();
+        String httpContextPath = scheme + "://"+httpServletRequest.getServerName();
+        int port = httpServletRequest.getServerPort();
+        if(!(port==80 || port==443)){
+            httpContextPath    +=  ":"+port;
         }
+        httpContextPath += httpServletRequest.getContextPath() + "";
+        
+        _logger.trace("httpContextPath " + httpContextPath);
+        return httpContextPath;
 
     }
 
@@ -220,6 +207,7 @@ public final class WebContext {
      * @return HttpSession
      */
     public static HttpSession getSession(boolean create) {
+        System.out.println("new Session created");
         return getRequest().getSession(create);
     }
 
@@ -293,6 +281,16 @@ public final class WebContext {
         }
 
         return locale;
+    }
+    
+    public static Map<String, String> getRequestParameterMap(HttpServletRequest request) {
+        Map<String, String> map = new HashMap<String, String>();
+        Map<String, String[]> parameters = request.getParameterMap();
+        for (String key : parameters.keySet()) {
+            String[] values = parameters.get(key);
+            map.put(key, values != null && values.length > 0 ? values[0] : null);
+        }
+        return map;
     }
 
     /**

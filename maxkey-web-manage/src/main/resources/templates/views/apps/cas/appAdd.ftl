@@ -13,20 +13,14 @@
 <script type="text/javascript">
 <!--
 $(function(){	
-	$("#algorithm").change(function(){
-		$.post("<s:Base/>/apps/generate/secret/"+$(this).val(), {_method:"post",currTime:(new Date()).getTime()}, function(data) {
-			$("#secret").val(data+"");
-			$("#secret_text").html(data+"");
-			
-		});
-	}); 
-
+	$("#isAdapter").val("1");
+	$("#adapter").val("org.maxkey.authz.cas.endpoint.adapter.CasDefaultAdapter");
 });
 //-->
 </script>
 </head>
 <body>
-<form id="actionForm_app"  method="post" type="label" autoclose="true"  
+<form id="actionForm_app"  method="post" type="label" autoclose="true"    closeWindow="true"
 			action="<@base/>/apps/cas/add"  
 			forward="<@base/>/apps/list"
 			enctype="multipart/form-data"
@@ -52,9 +46,9 @@ $(function(){
 								</td>
 							</tr>
 							<tr>
-								<th style="width:15%;"><@locale code="apps.cas.validation"/>：</th>
+								<th style="width:15%;"><@locale code="apps.cas.callbackUrl"/>：</th>
 								<td  colspan=3>
-									<input type="text" class="form-control" id="validation" name="validation"  title="" value=""  required=""  />
+									<input type="text" class="form-control" id="callbackUrl" name="callbackUrl"  title="" value=""  required=""  />
 								</td>
 							</tr>
 							<tr>

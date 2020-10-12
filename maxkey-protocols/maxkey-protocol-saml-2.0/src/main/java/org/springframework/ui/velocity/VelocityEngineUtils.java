@@ -1,4 +1,21 @@
 /*
+ * Copyright [2020] [MaxKey of copyright http://www.maxkey.top]
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+ 
+
+/*
  * Copyright 2002-2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -32,7 +49,6 @@ import org.apache.velocity.exception.VelocityException;
  * @since 22.01.2004
  * @deprecated as of Spring 4.3, in favor of FreeMarker
  */
-@Deprecated
 public abstract class VelocityEngineUtils {
 
 	/**
@@ -46,7 +62,6 @@ public abstract class VelocityEngineUtils {
 	 * @deprecated Use {@link #mergeTemplate(VelocityEngine, String, String, Map, Writer)}
 	 * instead, following Velocity 1.6's corresponding deprecation in its own API.
 	 */
-	@Deprecated
 	public static void mergeTemplate(
 			VelocityEngine velocityEngine, String templateLocation, Map<String, Object> model, Writer writer)
 			throws VelocityException {
@@ -86,7 +101,6 @@ public abstract class VelocityEngineUtils {
 	 * @deprecated Use {@link #mergeTemplateIntoString(VelocityEngine, String, String, Map)}
 	 * instead, following Velocity 1.6's corresponding deprecation in its own API.
 	 */
-	@Deprecated
 	public static String mergeTemplateIntoString(VelocityEngine velocityEngine, String templateLocation,
 			Map<String, Object> model) throws VelocityException {
 

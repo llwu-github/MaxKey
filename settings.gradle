@@ -4,10 +4,14 @@
 rootProject.name = 'MaxKey'
 
 //Common
-include 'maxkey-client-sdk'
 include 'maxkey-core'
-include 'maxkey-dao'
+include 'maxkey-persistence'
 include 'maxkey-authentications'
+
+//identity
+include 'maxkey-identitys:maxkey-identity-scim'
+include 'maxkey-identitys:maxkey-identity-kafka'
+include 'maxkey-identitys:maxkey-identity-rest'
 
 //Protocol
 //include 'maxkey-protocols'

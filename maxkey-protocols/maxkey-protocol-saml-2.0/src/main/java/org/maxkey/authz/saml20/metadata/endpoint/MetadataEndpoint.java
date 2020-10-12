@@ -1,3 +1,20 @@
+/*
+ * Copyright [2020] [MaxKey of copyright http://www.maxkey.top]
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+ 
+
 package org.maxkey.authz.saml20.metadata.endpoint;
 
 import javax.servlet.http.HttpServletRequest;
@@ -6,6 +23,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang.Validate;
 import org.maxkey.authz.saml.common.TrustResolver;
 import org.maxkey.authz.saml20.metadata.MetadataGenerator;
+import org.maxkey.constants.ContentType;
 import org.maxkey.crypto.keystore.KeyStoreLoader;
 import org.maxkey.domain.Saml20Metadata;
 import org.maxkey.web.WebContext;
@@ -51,11 +69,14 @@ public class MetadataEndpoint {
 	private Saml20Metadata saml20Metadata;
 	
 	private Credential signingCredential;
+	
+	public static String IDP_METADATA_PREFIX = "Idp_Metadata_";
 
 	@RequestMapping(value = "/{appid}.xml",produces = "application/xml")
 	public ModelAndView  metadata(HttpServletRequest request,
 			HttpServletResponse response, @PathVariable("appid") String appId) {
-		
+	    response.setContentType(ContentType.APPLICATION_XML_UTF8);
+	    appId = appId.substring(IDP_METADATA_PREFIX.length(), appId.length());
 		if(signingCredential==null){
 	        TrustResolver trustResolver = new TrustResolver();
 	        CredentialResolver credentialResolver=(CredentialResolver)trustResolver.buildKeyStoreCredentialResolver(
@@ -94,7 +115,7 @@ public class MetadataEndpoint {
 	        
 	        descriptor.getSingleLogoutServices().add(metadataGenerator.getSingleLogoutService(WebContext.getHttpContextPath()+"/logout",null));
 	        
-	        descriptor.getManageNameIDServices().add(metadataGenerator.getManageNameIDService(WebContext.getHttpContextPath()+"/saml/metadata/"+appId));
+	        descriptor.getManageNameIDServices().add(metadataGenerator.getManageNameIDService(WebContext.getHttpContextPath()+"/saml/metadata/"+IDP_METADATA_PREFIX+appId+".xml"));
 	             
 	        descriptor.getKeyDescriptors().add(metadataGenerator.generateEncryptionKeyDescriptor(signingCredential));  
 	         
@@ -134,8 +155,8 @@ public class MetadataEndpoint {
 	        
 	        String entityDescriptorXml=XMLHelper.prettyPrintXML(metadataGenerator.marshallerMetadata(entityDescriptor));
 	         
-	        logger.debug("EntityDescriptor element XML : \\n");
-	        logger.debug(entityDescriptorXml);
+	        logger.trace("EntityDescriptor element XML : \\n");
+	        logger.trace(entityDescriptorXml);
 	        
 	        ModelAndView mv = new ModelAndView("trusts/saml_v20_metadata");
 	        mv.addObject("metadata", entityDescriptorXml);

@@ -3,23 +3,12 @@
 <head>
 	<#include  "../../layout/header.ftl"/>
 	<#include  "../../layout/common.cssjs.ftl"/>
-<style   type="text/css">
-  .table th, .table td {
-    padding: .2rem;
-    vertical-align: middle;
-  }
-</style>
+	<#include  "../appCommonHead.ftl"/>
 <script type="text/javascript">
 <!--
 $(function(){	
-	$("#generateSecret").on("click",function(){
-		$.post("<@base/>/apps/generate/secret/oauth20", {_method:"post",currTime:(new Date()).getTime()}, function(data) {
-			$("#secret").val(data+"");
-			$("#secret_text").html(data+"");
-		}); 
-	});
 	
-	$("input[name='credential']").on("click",function(){
+	$("select[name='credential']").on("click",function(){
 		if($(this).val()=="3"){
 			$("#sharedconfigure").hide();
 			$("#systemconfigure").hide();
@@ -36,7 +25,7 @@ $(function(){
 </script>
 </head>
 <body>
-<form id="actionForm_app"  method="post" type="label" autoclose="true"  
+<form id="actionForm_app"  method="post" type="label" autoclose="true"    closeWindow="true"
    action="<@base/>/apps/extendapi/update"  
    forward="<@base/>/apps/list"
    enctype="multipart/form-data"
@@ -67,26 +56,20 @@ $(function(){
 				<tr>
 					<th style="width:15%;"><@locale code="apps.credential"/>：</th>
 					<td style="width:35%;">
-							<input type="radio" id="credential1" name="credential" class="credential" value="3"  <#if  3==model.credential >checked</#if> />
-							<@locale code="apps.credential.user-defined"/>
-							<input type="radio" id="credential3" name="credential" class="credential" value="2"  <#if  2==model.credential >checked</#if> />
-							<@locale code="apps.credential.shared"/>
-							<input type="radio" id="credential2" name="credential" class="credential" value="1"  <#if  1==model.credential >checked</#if> />
-							<@locale code="apps.credential.system"/>
-						
+						<select id="credential" name="credential"  class="form-control" >
+							<option value="3"   <#if  3==model.credential >selected</#if> >
+								<@locale code="apps.credential.user-defined"/>
+							</option>
+							<option value="2"   <#if  2==model.credential >selected</#if> >
+								<@locale code="apps.credential.shared"/>
+							</option>
+							<option value="1"   <#if  1==model.credential >selected</#if> >
+								<@locale code="apps.credential.system"/>
+							</option>
+						</select>						
 					</td>
-					<th style="width:15%;"><@locale code="apps.isAdapter"/>：</th>
+					<th style="width:15%;"></th>
 					<td style="width:35%;" >
-						<select  id="isAdapter" name="isAdapter"  class="form-control" >
-							<option value="0"  <#if  0==model.isAdapter >selected</#if> ><@locale code="apps.isAdapter.no"/></option>
-							<option value="1"  <#if  1==model.isAdapter >selected</#if> ><@locale code="apps.isAdapter.yes"/></option>
-						</select>
-					</td>
-				</tr>
-				<tr>
-					<th><@locale code="apps.adapter"/>：</th>
-					<td colspan =3>
-						<input type="text" class="form-control"  id="adapter" name="adapter"  title="" value="${model.adapter}"/>
 					</td>
 				</tr>
 				<tr id="systemconfigure"  <#if  1!=model.credential > style="display:none"</#if> >
@@ -115,7 +98,6 @@ $(function(){
 					<th><@locale code="apps.credential.sharedPassword"/>：</th>
 					<td>
 						<input type="text" class="form-control"  id="sharedPassword" name="sharedPassword" value="${model.sharedPassword}" />
-						
 					</td>
 				</tr>
 				

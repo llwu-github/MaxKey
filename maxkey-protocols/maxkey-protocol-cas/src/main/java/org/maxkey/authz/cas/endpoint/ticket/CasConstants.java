@@ -1,3 +1,20 @@
+/*
+ * Copyright [2020] [MaxKey of copyright http://www.maxkey.top]
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+ 
+
 package org.maxkey.authz.cas.endpoint.ticket;
 
 
@@ -6,6 +23,8 @@ public class CasConstants {
 	public static final class PARAMETER{
 		public final static String ENDPOINT_CAS_DETAILS="CAS_AUTHORIZE_ENDPOINT_CAS_DETAILS";
 		
+		public final static String PARAMETER_MAP="CAS_AUTHORIZE_ENDPOINT_PARAMETER_MAP";
+
 		/** Constant representing the ticket parameter in the request. */
 		public final static String TICKET="ticket";
 		
@@ -38,6 +57,10 @@ public class CasConstants {
 
 	    /** Constant representing the pgtIou parameter in the request. */
 		public static final String PROXY_GRANTING_TICKET_IOU = "pgtIou";
+		
+		public static final String REST_USERNAME = "username";
+		
+		public static final String REST_PASSWORD = "password";
 	}
 	
 	public  static final class  FORMAT_TYPE {
@@ -64,6 +87,8 @@ public class CasConstants {
 		public static final String PROXY_GRANTING_TICKET_PREFIX = "PGT";
 	    /** The prefix to use when generating an id for a Proxy Granting Ticket IOU. */
 		public static final String PROXY_GRANTING_TICKET_IOU_PREFIX = "PGTIOU";
+		
+		public static final String TICKET_GRANTING_TICKET_PREFIX = "TGT";
 	}
 	
 	/* CAS Protocol Error Codes. **/

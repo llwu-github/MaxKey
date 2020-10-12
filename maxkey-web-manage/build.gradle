@@ -3,28 +3,31 @@ description = "maxkey-web-manage"
 // Apply the java plugin to add support for Java
 apply plugin: 'java'
 //apply plugin: 'war'
-apply plugin: 'eclipse-wtp'
-apply plugin: 'com.bmuschko.tomcat-base'
-apply plugin: 'com.bmuschko.tomcat'
+//apply plugin: 'eclipse-wtp'
+//apply plugin: 'com.bmuschko.tomcat-base'
+//apply plugin: 'com.bmuschko.tomcat'
 
 buildscript {
   repositories {
   jcenter()
   }
   dependencies {
-  	classpath "com.bmuschko:gradle-tomcat-plugin:2.2.3"
+  	//classpath "com.bmuschko:gradle-tomcat-plugin:2.2.3"
   }
 }
 
 dependencies {
 	compile project(":maxkey-core")
-   	compile project(":maxkey-dao")
-   	compile project(":maxkey-client-sdk")
+   	compile project(":maxkey-persistence")
    	compile project(":maxkey-protocols:maxkey-protocol-oauth-2.0")
-   	compile project(":maxkey-protocols:maxkey-protocol-saml-2.0")   	
+   	compile project(":maxkey-protocols:maxkey-protocol-saml-2.0")   
+   	compile project(":maxkey-identitys:maxkey-identity-scim")   
+   	compile project(":maxkey-identitys:maxkey-identity-kafka")	
+   	compile project(":maxkey-identitys:maxkey-identity-rest")
    	
 }
 
+/*
 eclipse {
 
 	wtp {
@@ -36,4 +39,4 @@ eclipse {
 		}	
     
 	}
-}
+}*/

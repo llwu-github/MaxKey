@@ -17,56 +17,54 @@
 	        http://www.springframework.org/schema/util/spring-util.xsd
 	        http://www.springframework.org/schema/mvc 
 	        http://www.springframework.org/schema/mvc/spring-mvc.xsd">
-    <!-- enable autowire -->
-    <context:annotation-config />
-    <!-- language select must remove -->
-	<mvc:annotation-driven />
-    	
-    <!-- Application properties configs  -->
-	<bean  id="propertySourcesPlaceholderConfigurer"  class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer">
-	  <property name="locations">
-	    <list>
-	   	  <value>classpath:config/applicationConfig.properties</value>	
-	   	   <value>classpath:application.properties</value>   	  
-	    </list>
-	  </property>
-	  <property name="ignoreUnresolvablePlaceholders" value="true"/>
-	</bean>
-	
-	<context:component-scan base-package="org.maxkey.config" />
-	
-	<bean id="keyStoreLoader" class="org.maxkey.crypto.keystore.KeyStoreLoader">
-    	<property name="entityName" value="${config.saml.v20.idp.issuing.entity.id}" />
-		<property name="keystorePassword" value="${config.saml.v20.idp.keystore.password}" /> 
-		<property name="keystoreFile" value="${config.saml.v20.idp.keystore}"/>
-		
-	</bean>
-	
-	<bean id="spKeyStoreLoader" class="org.maxkey.crypto.keystore.KeyStoreLoader">
-    	<property name="entityName" value="${config.saml.v20.sp.issuing.entity.id}" />
-		<property name="keystorePassword" value="${config.saml.v20.sp.keystore.password}" /> 
-		<property name="keystoreFile" value="${config.saml.v20.sp.keystore}"/>
-	</bean>
-	
-	<bean id="spIssuingEntityName" class="java.lang.String" >
-		<constructor-arg value="${config.saml.v20.sp.issuing.entity.id}"/>
-	</bean>
-	
-	<bean id="maxKeyURI" class="java.lang.String" >
-		<constructor-arg value="${config.maxkey.uri}"/>
-	</bean>
-	
-	<bean id="oauth20JdbcClientDetailsService" class="org.maxkey.authz.oauth2.provider.client.JdbcClientDetailsService">
-		<constructor-arg ref="dataSource" /> 
-		<property name="passwordEncoder" ref="passwordReciprocal"></property>
-	</bean>
-	
-	<import resource="maxkey-mgt-persistence.xml"/>
-	
-	<import resource="maxkey-mgt-web.xml"/>
-	
-	<import resource="maxkey-mgt-security.xml"/>
-	
-	<import resource="maxkey-mgt-task.xml"/>
+
+    <bean id="tfaOptAuthn" class="org.maxkey.crypto.password.opt.impl.TimeBasedOtpAuthn">
+    </bean>
+    
+    <!-- LDAP Realm 
+    <bean id="authenticationRealm" class="org.maxkey.web.authentication.realm.ldap.LdapAuthenticationRealm">
+        <constructor-arg ref="jdbcTemplate"/>
+        <property name="ldapServers">
+            <list>
+                <bean id="ldapServer1" class="org.maxkey.web.authentication.realm.ldap.LdapServer">
+                    <property name="ldapUtils">
+                        <bean id="ldapUtils" class="org.maxkey.ldap.LdapUtils">
+                            <property name="providerUrl" value="ldap://localhost:389"></property>
+                            <property name="principal" value="cn=root"></property>
+                            <property name="credentials" value="rootroot"></property>
+                            <property name="baseDN" value="dc=connsec,dc=com"></property>
+                        </bean>
+                    </property>
+                    <property name="filterAttribute" value="uid"></property>
+                </bean> 
+            </list>
+        </property>
+    </bean> -->
+    
+    <!-- Active Directory  Realm 
+    <bean id="authenticationRealm" class="org.maxkey.web.authentication.realm.activedirectory.ActiveDirectoryAuthenticationRealm">
+        <constructor-arg ref="jdbcTemplate"/>
+        <property name="activeDirectoryServers">
+            <list>
+                <bean id="activeDirectory1" class="org.maxkey.web.authentication.realm.activedirectory.ActiveDirectoryServer">
+                    <property name="activeDirectoryUtils">
+                        <bean id="ldapUtils" class="org.maxkey.ldap.ActiveDirectoryUtils">
+                            <property name="providerUrl" value="ldap://localhost:389"></property>
+                            <property name="principal" value="cn=root"></property>
+                            <property name="credentials" value="rootroot"></property>
+                            <property name="domain" value="connsec"></property>
+                        </bean>
+                    </property>
+                </bean> 
+            </list>
+        </property>
+    </bean> -->
+    
+    <!-- Default Realm-->
+    <!-- realm use jdbc -->
+    <bean id="authenticationRealm" class="org.maxkey.authn.realm.jdbc.JdbcAuthenticationRealm">
+        <constructor-arg ref="jdbcTemplate"/>
+    </bean>
+
 	
 </beans>

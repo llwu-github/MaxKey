@@ -1,3 +1,20 @@
+/*
+ * Copyright [2020] [MaxKey of copyright http://www.maxkey.top]
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+ 
+
 package org.maxkey.authn.support.jwt;
 
 import com.nimbusds.jose.JOSEException;
@@ -13,8 +30,8 @@ import java.util.Date;
 import java.util.UUID;
 import javax.servlet.http.HttpServletResponse;
 import org.joda.time.DateTime;
-import org.maxkey.config.ApplicationConfig;
-import org.maxkey.config.oidc.OIDCProviderMetadataDetails;
+import org.maxkey.authn.AbstractAuthenticationProvider;
+import org.maxkey.configuration.oidc.OIDCProviderMetadataDetails;
 import org.maxkey.constants.ConstantsLoginType;
 import org.maxkey.crypto.jwt.signer.service.impl.DefaultJwtSigningAndValidationService;
 import org.maxkey.web.WebContext;
@@ -25,12 +42,23 @@ import org.slf4j.LoggerFactory;
 public class JwtLoginService {
     private static final Logger _logger = LoggerFactory.getLogger(JwtLoginService.class);
 
-    protected ApplicationConfig applicationConfig;
 
     OIDCProviderMetadataDetails jwtProviderMetadata;
 
     DefaultJwtSigningAndValidationService jwtSignerValidationService;
+    
+    AbstractAuthenticationProvider authenticationProvider ;
 
+    
+    public JwtLoginService(AbstractAuthenticationProvider authenticationProvider,
+            OIDCProviderMetadataDetails jwtProviderMetadata,
+            DefaultJwtSigningAndValidationService jwtSignerValidationService
+            ) {
+        this.authenticationProvider = authenticationProvider;
+        this.jwtProviderMetadata = jwtProviderMetadata;
+        this.jwtSignerValidationService = jwtSignerValidationService;
+        
+    }
     public boolean login(String jwt, HttpServletResponse response) {
         _logger.debug("jwt : " + jwt);
 
@@ -76,9 +104,8 @@ public class JwtLoginService {
             DateTime now = new DateTime();
 
             if (loginResult && now.isBefore(jwtClaimsSet.getExpirationTime().getTime())) {
-                if (WebContext.setAuthentication(username, ConstantsLoginType.JWT, "", "", "success")) {
-                    return true;
-                }
+                authenticationProvider.trustAuthentication(username, ConstantsLoginType.JWT, "", "", "success");
+                return true;
             }
         } catch (java.text.ParseException e) {
             // Invalid signed JWT encoding
@@ -169,9 +196,6 @@ public class JwtLoginService {
         return loginResult;
     }
 
-    public void setApplicationConfig(ApplicationConfig applicationConfig) {
-        this.applicationConfig = applicationConfig;
-    }
 
     public void setJwtProviderMetadata(OIDCProviderMetadataDetails jwtProviderMetadata) {
         this.jwtProviderMetadata = jwtProviderMetadata;
@@ -179,6 +203,10 @@ public class JwtLoginService {
 
     public void setJwtSignerValidationService(DefaultJwtSigningAndValidationService jwtSignerValidationService) {
         this.jwtSignerValidationService = jwtSignerValidationService;
+    }
+
+    public void setAuthenticationProvider(AbstractAuthenticationProvider authenticationProvider) {
+        this.authenticationProvider = authenticationProvider;
     }
 
 }
